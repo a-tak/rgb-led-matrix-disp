@@ -113,8 +113,10 @@ class MeigenDisp(DispAbc):
         contents = []
         next_cursor = ""
         notion = Client(auth=notion_token)
+
         while next_cursor != None:
-            if next_cursor == "":
+            # 初回と次ページがない時のクエリ
+            if next_cursor == "" or next_cursor == None:
                 pages = notion.databases.query(
                     **{
                         "database_id": notion_db_id,
@@ -127,6 +129,7 @@ class MeigenDisp(DispAbc):
                     }
                 )
             else:
+                # 次ページがある場合のクエリ 前のnext_cursorでもどってきたのをstart_cursorに指定する
                 # NotionのAPIは秒間平均3リクエストなので間隔を開ける
                 time.sleep(0.4)
                 pages = notion.databases.query(
@@ -144,12 +147,13 @@ class MeigenDisp(DispAbc):
             next_cursor = pages["next_cursor"]
             for result in pages["results"]:
                 line = ""
+                # 1レコードで複数に分かれる場合があるので1行に結合する
                 for word in result["properties"]["meigen"]["title"]:
                     line = line + word["text"]["content"]
                 contents.append(line)
                 # logger.debug(line)
 
-        # logger.debug(len(contents))
+        logger.debug(len(contents))
 
         while True:
             # 名言表示ループ
