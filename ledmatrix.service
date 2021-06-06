@@ -1,0 +1,13 @@
+[Unit]
+Description=RGB MATRIX Panel Display Service
+After=syslog.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/rgb-led-matrix-disp
+ExecStart=/usr/bin/python3 /home/pi/rgb-led-matrix-disp/main.py --led-rows=16 --led-brightness=40
+TimeoutStopSec=5
+StandardOutput=null
+
+[Install]
+WantedBy = multi-user.target
