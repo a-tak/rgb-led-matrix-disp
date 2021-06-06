@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: UTF-8
 # Display a Meigen
+# sudo python3 ./meigen_disp.py --led-rows=16 --led-brightness=40
 from disp_abc import DispAbc
 from matrix import Matrix
 import time
@@ -109,27 +110,48 @@ class MeigenDisp(DispAbc):
         notion_db_id = setting["notion-db-id"]
 
         # Notionからデータ取得(一旦モード切替時のみ読み込むようにした)
-        notion = Client(auth=notion_token)
-        pages = notion.databases.query(
-            **{
-                "database_id": notion_db_id
-            }
-        )
         contents = []
-        for result in pages["results"]:
-            for word in result["properties"]["meigen"]["title"]:
-                logger.debug(word["text"]["content"])
-                contents.append(word["text"]["content"])
+        next_cursor = ""
+        notion = Client(auth=notion_token)
+        while next_cursor != None:
+            if next_cursor == "":
+                pages = notion.databases.query(
+                    **{
+                        "database_id": notion_db_id,
+                        "sorts": [
+                            {
+                                "timestamp": "last_edited_time",
+                                "direction": "descending"
+                            }
+                        ]
+                    }
+                )
+            else:
+                # NotionのAPIは秒間平均3リクエストなので間隔を開ける
+                time.sleep(0.4)
+                pages = notion.databases.query(
+                    **{
+                        "database_id": notion_db_id,
+                        "start_cursor": next_cursor,
+                        "sorts": [
+                            {
+                                "timestamp": "last_edited_time",
+                                "direction": "descending"
+                            }
+                        ]
+                    }
+                )
+            next_cursor = pages["next_cursor"]
+            for result in pages["results"]:
+                line = ""
+                for word in result["properties"]["meigen"]["title"]:
+                    line = line + word["text"]["content"]
+                contents.append(line)
+                # logger.debug(line)
+
+        # logger.debug(len(contents))
 
         while True:
-            # 画面クリア
-            # double_buffer = self.matrix.matrix.CreateFrameCanvas()
-            # double_buffer.Clear()
-            # result = self.get_text(
-            #     "　　", (16*2), u"", "#7777FF")
-            # double_buffer.SetImage(result,0)
-            # double_buffer = self.matrix.matrix.SwapOnVSync(double_buffer)
-
             # 名言表示ループ
             for item in contents:
                 if self.accepted_stop:
