@@ -23,6 +23,20 @@ sudo pip3 install pyyaml
 sudo pip3 install notion-client
 ```
 
+## LEDパネル制御ライブラリ
+
+以下も必要。
+
+[Controlling RGB LED display with Raspberry Pi GPIO](https://github.com/hzeller/rpi-rgb-led-matrix/)
+
+[このあたり](https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python)を参考にPython用ライブラリのビルドが必要。
+
+## フォント
+
+以下からダウンロードし`fonts`ディレクトリを作成して入れてください。
+* http://jikasei.me/font/kh-dotfont/
+* https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/fonts
+
 ## setting.yamlの設定
 
 |項目|内容|
@@ -58,8 +72,3 @@ Alexaで制御する場合はNode-Redが必要。
 * [Raspberry Pi3B+でRGB LEDmatirix電光掲示板の表示を自在に操る](https://qiita.com/shuto1441/items/4c691dd3af948cc19bdf)
 * [AlexaからRaspberry Piを経由して家電を音声で操作する](https://www.zumid.net/entry/raspberry-pi-alexa-home-app/)
 * [Raspberry Piで実行する](https://nodered.jp/docs/getting-started/raspberrypi)
-
-## 
-本ソフトでは表示フォントに「KHドットフォント」(http://jikasei.me/font/kh-dotfont/) を使用しています。
-Licensed under SIL Open Font License 1.1 (http://scripts.sil.org/OFL)
-© Keitarou Hiraki, Font Silo 1990-2015.
