@@ -148,7 +148,7 @@ class MeigenDisp(DispAbc):
             for result in pages["results"]:
                 line = ""
                 # 1レコードで複数に分かれる場合があるので1行に結合する
-                for word in result["properties"]["meigen"]["title"]:
+                for word in result["properties"]["Name"]["title"]:
                     line = line + word["text"]["content"]
                 contents.append(line)
                 # logger.debug(line)
