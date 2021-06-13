@@ -10,6 +10,7 @@ from PIL import Image, ImageFont, ImageDraw
 from logging import getLogger, StreamHandler, DEBUG
 from notion_client import Client
 import yaml
+from datetime import datetime as dt
 
 logger = getLogger(__name__)
 handler = StreamHandler()
@@ -19,9 +20,16 @@ logger.addHandler(handler)
 
 
 class MeigenDisp(DispAbc):
-    u"""
-    名言表示クラス
-    """
+    """名言表示クラス"""
+
+    # テキストと関数を分割する文字
+    FUNC_SEP = ';'
+    # リプレースホルダの文字列
+    REP_HOLDER = '{0}'
+    # 変換タイプとパラメーターを分割する文字
+    TYPE_SEP = ':'
+    # 変換タイプ 日付カウント
+    FUNC_DATE_COUNT = 'datecount'
 
     def __init__(self, matrix: Matrix):
         self.matrix = matrix
@@ -95,10 +103,65 @@ class MeigenDisp(DispAbc):
         dst.paste(im2, (im1.width, 0))
         return dst
 
+    def replace_text(self, text):
+        """テキスト内のリプレースホルダを置き換える"""
+        # セミコロンで分割
+        text_and_func = text.split(self.FUNC_SEP)
+
+        # セミコロンがない、もしくは3つ以上の時は変換せずにもどる
+        if len(text_and_func) ==1 or len(text_and_func) >= 3:
+            return text
+
+        text_body = text_and_func[0]
+        func_and_param = text_and_func[1]
+        
+        # リプレースホルダがない場合はテキストをそのまま戻す
+        if not (self.REP_HOLDER in text_body):
+            return text_body
+
+        # 変換タイプ名とパラメーターを分割
+        type_and_param = text_and_func[1].split(self.TYPE_SEP)
+
+        # 変換タイプとパラメーターが分割できない場合はテキストをそのまま戻す
+        if len(type_and_param) == 1 or len(type_and_param) >= 3:
+            return text_and_func[0]
+        
+        func_type = type_and_param[0]
+        # ダブルクォーテーション外す
+        func_param = type_and_param[1].replace('"','').strip()
+
+        # 変換タイプ毎の処理
+        result = ""
+        if func_type == self.FUNC_DATE_COUNT:
+            result = self.replace_datecount(text_body, func_param)
+        else:
+            # 該当する変換タイプがない時は変換せずに返す
+            return text_body
+
+        # 変換結果応答
+        return result
+
+    def replace_datecount(self, text, parameter):
+        """テキスト内に日付カウントを埋め込む"""
+        # 文字列から日付変換 & パラメーターが日付形式か?
+        base_date = None
+        try:
+            base_date = dt.strptime(parameter, '%Y/%m/%d')
+        except ValueError:
+            # 日付に変換できないパラメーターの場合は変換せずに返す
+            return text
+
+        # 今日までの日数カウント
+        daycount = (dt.now() - base_date).days
+
+        # テキストに埋め込み
+        result = text.replace(self.REP_HOLDER, str(daycount))
+
+        # 変換結果応答
+        return result
+
     def execute(self):
-        u"""
-        名言表示開始
-        """
+        """名言表示開始"""
         logger.debug("MeigenDisp Start")
 
         #設定読み込み
@@ -148,12 +211,12 @@ class MeigenDisp(DispAbc):
             for result in pages["results"]:
                 line = ""
                 # 1レコードで複数に分かれる場合があるので1行に結合する
-                for word in result["properties"]["meigen"]["title"]:
+                for word in result["properties"]["Name"]["title"]:
                     line = line + word["text"]["content"]
-                contents.append(line)
-                # logger.debug(line)
 
-        logger.debug(len(contents))
+                # 動的変換処理
+                line = self.replace_text(line)
+                contents.append(line)
 
         while True:
             # 名言表示ループ
