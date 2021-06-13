@@ -100,6 +100,30 @@ Alexaで制御する場合はNode-Redが必要。
 
  [flows.json](flows.json)
 
+## 温度・湿度・気圧表示モジュール
+
+### 使用部品
+
+* 温湿度・気圧センサ AE-BME280
+
+### 回路図
+
+![](doc-image/circuit-diagram.jpg)
+
+* 明るさセンサ(照度センサ) TSL2561も回路図にあるが使用していない
+
+### 設定
+
+* I2CをRasp Configで有効にする
+* 関連モジュールインストールと設定
+    ```bash
+    sudo apt-get update
+    sudo apt-get install i2c-tools
+    sudo apt-get install python-smbus
+    sudo pip3 install smbus2
+    sudo chmod a+rw /dev/i2c-1
+    ```
+
 ## 参考
 
 * [Raspberry Pi で LED時計を作ってみた](https://a-tak.com/blog/2017/02/raspberry-pi-led-clock/)
