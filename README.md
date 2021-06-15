@@ -139,3 +139,4 @@ Alexaで制御する場合はNode-Redが必要。
 * [Raspberry Pi3B+でRGB LEDmatirix電光掲示板の表示を自在に操る](https://qiita.com/shuto1441/items/4c691dd3af948cc19bdf)
 * [AlexaからRaspberry Piを経由して家電を音声で操作する](https://www.zumid.net/entry/raspberry-pi-alexa-home-app/)
 * [Raspberry Piで実行する](https://nodered.jp/docs/getting-started/raspberrypi)
+* [SWITCHSCIENCE/BME280](https://github.com/SWITCHSCIENCE/BME280/blob/master/Python27/bme280_sample.py)
