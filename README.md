@@ -123,6 +123,14 @@ Alexaで制御する場合はNode-Redが必要。
     sudo pip3 install smbus2
     sudo chmod a+rw /dev/i2c-1
     ```
+* 権限の設定
+    ```bash
+    sudo vim /etc/udev/rules.d/99-com.rules
+    ```
+
+    ```bash
+    SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="066**6**"
+    ```
 
 ## 参考
 
